@@ -25,7 +25,7 @@ def load_preprocessed_data(filepath):
     TARGET = "price_category"
 
     # ===============================
-    # AUTO CREATE TARGET IF NOT EXIST
+    # CREATE TARGET IF NOT EXISTS
     # ===============================
     if TARGET not in df.columns:
         if "price" not in df.columns:
@@ -38,11 +38,23 @@ def load_preprocessed_data(filepath):
         df[TARGET] = pd.qcut(
             df["price"],
             q=3,
-            labels=["low", "medium", "high"]
+            labels=["Rendah", "Sedang", "Tinggi"]
         )
 
+    # ===============================
+    # SPLIT X & y
+    # ===============================
     X = df.drop(columns=[TARGET])
     y = df[TARGET].values
+
+    # ===============================
+    # DROP NON-NUMERIC FEATURES (CRITICAL FIX)
+    # ===============================
+    non_numeric_cols = X.select_dtypes(include=["object"]).columns.tolist()
+
+    if non_numeric_cols:
+        print("Dropping non-numeric columns:", non_numeric_cols)
+        X = X.drop(columns=non_numeric_cols)
 
     return X, y
 
@@ -140,3 +152,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
